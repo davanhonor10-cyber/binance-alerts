@@ -238,6 +238,13 @@ Respond in JSON only:
             return {}
         raw = r.json()["content"][0]["text"].strip()
         raw = raw.replace("```json", "").replace("```", "").strip()
+        # Extract just the JSON object to handle extra text after it
+        start = raw.find("{")
+        end = raw.rfind("}") + 1
+        if start == -1 or end == 0:
+            log.error(f"No JSON found in response: {raw[:100]}")
+            return {}
+        raw = raw[start:end]
         return json.loads(raw)
     except Exception as e:
         log.error(f"Claude analysis failed for {symbol}: {e}")
